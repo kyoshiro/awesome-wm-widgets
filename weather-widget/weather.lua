@@ -127,8 +127,11 @@ local function worker(user_args)
     end
 
     local coordinates = args.coordinates
-    local api_key = args.api_key
+	-- local api_key = args.api_key
     local font_name = args.font_name or beautiful.font:gsub("%s%d+$", "")
+    local font = args.font or 'sans 8'
+    local city = args.city or 'Montreal,ca'
+    local api_key = args.api_key or naughty.notify{preset = naughty.config.presets.critical, text = 'OpenweatherMap API key is not set'}
     local units = args.units or 'metric'
     local time_format_12h = args.time_format_12h
     local both_units_widget = args.both_units_widget or false
