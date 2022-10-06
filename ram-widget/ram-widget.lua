@@ -11,16 +11,24 @@ local ramgraph_widget = {}
 local function worker(user_args)
     local args = user_args or {}
     local timeout = args.timeout or 1
+    local color_used = args.color_used or beautiful.bg_urgent
+    local color_free = args.color_free or beautiful.fg_normal
+    local color_buf  = args.color_buf  or beautiful.border_color_active
+    local widget_show_buf = args.widget_show_buf or false
+    local widget_height = args.widget_height or 25
+    local widget_width = args.widget_width or 25
 
     --- Main ram widget shown on wibar
     ramgraph_widget = wibox.widget {
         border_width = 0,
         colors = {
-           beautiful.bg_urgent, -- used
-           beautiful.fg_normal  -- free
+           color_used,
+           color_free,
+           color_buf,
         },
         display_labels = false,
-        forced_width = 25,
+        forced_height = widget_height,
+        forced_width = widget_width,
         widget = wibox.widget.piechart
     }
 
@@ -33,9 +41,9 @@ local function worker(user_args)
           forced_height = 200,
           forced_width = 400,
           colors = {
-             beautiful.bg_urgent,           -- used
-             beautiful.fg_normal,           -- free
-             beautiful.border_color_active, -- buf_cache
+             color_used,
+             color_free,
+             color_buf,  -- buf_cache
           },
        },
        shape = gears.shape.rounded_rect,
@@ -56,7 +64,11 @@ local function worker(user_args)
             total, used, free, shared, buff_cache, available, total_swap, used_swap, free_swap =
                 stdout:match('(%d+)%s*(%d+)%s*(%d+)%s*(%d+)%s*(%d+)%s*(%d+)%s*Swap:%s*(%d+)%s*(%d+)%s*(%d+)')
 
-            widget.data = { used, total-used }
+            if widget_show_buf then
+                widget.data = { used, free, buff_cache }
+            else
+                widget.data = { used, total-used }
+            end
 
             if popup.visible then
                popup:get_widget().data_list = {
